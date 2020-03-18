@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+
+  db:
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    image: postgres:9.6.17
+    ports:
+      - 5432:5432
+    volumes:
+      - ./postgres:/var/lib/postgresql/data/
+
+  app:
+    build:
+      context: .
+    command: python3 manage.py runserver 0.0.0.0:8000
+    depends_on:
+      - db
+    env_file:
+      - .env
+    links:
+      - db
+    ports:
+      - 8000:8000
+    volumes:
+      - ./project:/app/project
+      - ./website_content_extractor:/app/website_content_extractor
