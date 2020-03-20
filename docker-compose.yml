@@ -14,7 +14,7 @@ services:
   app:
     build:
       context: .
-    command: python3 manage.py runserver 0.0.0.0:8000
+    command: bash wait_for_postgres.sh db:5432 python3 manage.py runserver 0.0.0.0:8000
     depends_on:
       - db
       - migration
@@ -31,7 +31,7 @@ services:
   migration:
     build:
       context: .
-    command: python3 manage.py migrate
+    command: bash wait_for_postgres.sh db:5432 python3 manage.py migrate
     depends_on:
       - db
     env_file:
