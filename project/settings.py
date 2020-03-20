@@ -91,6 +91,7 @@ if os.environ.get('POSTGRES_HOST'):
         'HOST': os.environ.get('POSTGRES_HOST'),
         'NAME': os.environ.get('POSTGRES_DB'),
         'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
     }
 
 # Logging
