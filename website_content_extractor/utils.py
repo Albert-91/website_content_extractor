@@ -4,6 +4,7 @@ from urllib.parse import urlparse
 
 import bs4 as bs
 import requests
+from bs4.element import Comment
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from requests import Response
@@ -37,6 +38,17 @@ def get_url_photos_from_website(url: Text) -> Union[List[Text], None]:
         return url_photos
 
 
+def get_text_from_html(url: Text) -> Union[List[Text], None]:
+    r = validate_url(url)
+    if r:
+        soup = bs.BeautifulSoup(r.text, 'html.parser')
+        texts = soup.findAll(text=True)
+        visible_texts = filter(_get_visible_tag, texts)
+        visible_texts = [text.replace('\n', ' ').replace('\r', '').strip() for text in visible_texts]
+        visible_texts = [" ".join(text.split()) for text in visible_texts if text != '']
+        return visible_texts
+
+
 def validate_url(url: Text) -> Union[Response, None]:
     r = None
     try:
@@ -47,3 +59,11 @@ def validate_url(url: Text) -> Union[Response, None]:
     except (ValidationError, MissingSchema, HTTPError, ConnectionError) as e:
         logger.error(e)
     return r
+
+
+def _get_visible_tag(element):
+    if element.parent.name in ['style', 'script', 'head', 'title', 'meta', '[document]']:
+        return False
+    if isinstance(element, Comment):
+        return False
+    return True
