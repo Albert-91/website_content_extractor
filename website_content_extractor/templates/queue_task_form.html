@@ -8,4 +8,10 @@
         <input type="submit" value="Extract">
     </form>
 
+    {% if status == 'success' %}
+    Your task has been added!
+    {% elif status == 'warning' %}
+    At least one box should be checked!
+    {% endif %}
+
 {% endblock %}
