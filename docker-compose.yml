@@ -43,3 +43,35 @@ services:
     volumes:
       - ./project:/app/project
       - ./website_content_extractor:/app/website_content_extractor
+
+  redis:
+    image: redis:5.0.7
+    ports:
+      - 6379:6379
+
+  celery_beat:
+    build:
+      context: .
+    command: celery -A project beat --loglevel "INFO"
+    depends_on:
+      - redis
+      - db
+    env_file:
+      - .env
+    volumes:
+      - ./project:/app/project
+      - ./website_content_extractor:/app/website_content_extractor
+
+  celery_worker:
+    build:
+      context: .
+    command: celery -A project worker --loglevel "INFO" --queues "default" --concurrency "2"
+    depends_on:
+      - redis
+      - celery_beat
+      - db
+    env_file:
+      - .env
+    volumes:
+      - ./project:/app/project
+      - ./website_content_extractor:/app/website_content_extractor
