@@ -1,18 +1,12 @@
-import unittest
-
-import requests
-from django.core.exceptions import ValidationError
 from django.test import TestCase
-from requests.exceptions import MissingSchema
+
 from website_content_extractor.utils import get_url_photos_from_html
 
 
-# ValidationError, MissingSchema, requests.HTTPError
-
-# print(get_url_photos_from_website('www.wwww.pl/'))
-
-
 class GetUrlPhotosFromWebsite(TestCase):
+
+    def test__photo_url_extractor__should__return__None_if_url_is_not_string(self):
+        self.assertEqual(get_url_photos_from_html(2), None)
 
     def test__photo_url_extractor__should__return__None_if_url_has_no_scheme(self):
         self.assertEqual(get_url_photos_from_html('www.google.pl'), None)
@@ -38,7 +32,3 @@ class GetUrlPhotosFromWebsite(TestCase):
         photo_urls = get_url_photos_from_html('https://en.wikipedia.org/wiki/Hulk')
         for url in photo_urls:
             self.assertNotEqual(get_url_photos_from_html(url), None)
-
-
-if __name__ == "__main__":
-    unittest.main()

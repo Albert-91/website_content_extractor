@@ -21,9 +21,8 @@ def get_url_photos_from_html(url: Text) -> Union[List[Text], None]:
     """
 
     r = validate_url(url)
-    parsed_uri = urlparse(url)
-
     if r:
+        parsed_uri = urlparse(url)
         soup = bs.BeautifulSoup(r.text, features='html.parser')
         url_photos = []
         for img_tag in soup.find_all('img'):
