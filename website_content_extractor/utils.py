@@ -13,7 +13,7 @@ from requests.exceptions import MissingSchema, ConnectionError, HTTPError
 logger = logging.getLogger(__name__)
 
 
-def get_url_photos_from_website(url: Text) -> Union[List[Text], None]:
+def get_url_photos_from_html(url: Text) -> Union[List[Text], None]:
     """
     Function gets url and returns a list of urls with all images from url input
     :param url:
