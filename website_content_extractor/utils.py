@@ -8,7 +8,7 @@ from bs4.element import Comment
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from requests import Response
-from requests.exceptions import MissingSchema, ConnectionError, HTTPError
+from requests.exceptions import MissingSchema, ConnectionError, HTTPError, InvalidSchema
 
 logger = logging.getLogger(__name__)
 
@@ -55,8 +55,8 @@ def validate_url(url: Text) -> Union[Response, None]:
         URLValidator(url)
         r = requests.get(url=url)
         if not r.status_code == 200:
-            raise HTTPError("Request status code is not equal 200.")
-    except (ValidationError, MissingSchema, HTTPError, ConnectionError) as e:
+            raise HTTPError(f"Request status code is {r.status_code} but should 200.")
+    except (ValidationError, MissingSchema, HTTPError, ConnectionError, InvalidSchema) as e:
         logger.error(e)
     return r
 
