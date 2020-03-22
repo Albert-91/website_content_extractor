@@ -14,7 +14,7 @@ class QueueTask(Timestamps, models.Model):
     class TaskState(Enum):
         PENDING = "pending"
         FAILURE = "failure"
-        DONE = "done"
+        SUCCESS = "success"
 
         @classmethod
         def value_name_pairs(cls) -> List:
