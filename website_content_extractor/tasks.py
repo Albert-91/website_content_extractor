@@ -3,7 +3,8 @@ import logging
 
 from celery import shared_task
 from django.db import transaction
-
+from django_pglocks import advisory_lock
+from project import settings
 from website_content_extractor.models import QueueTask, WebsiteText, WebsiteImage
 
 from website_content_extractor.utils import get_text_from_html, get_url_images_from_html
@@ -13,6 +14,16 @@ logger = logging.getLogger(__name__)
 
 @shared_task(autoretry_for=(Exception,), retry_backoff=10, retry_kwargs={'max_retries': 2})
 def extract_website():
+    with advisory_lock(lock_id=settings.CELERY_LOCK_ID, wait=False) as acquired:
+        if not acquired:
+            logger.info("already running task: extract_website; exit")
+            return
+
+        tasks = QueueTask.objects.filter(state=QueueTask.TaskState.PENDING.value).order_by('created_at')
+        save_website_content(tasks)
+
+
+def save_website_content(tasks: List[QueueTask]):
     with transaction.atomic():
         # with advisory_lock(lock_id=LOCK_ID, wait=False) as acquired:
         # if not acquired:
