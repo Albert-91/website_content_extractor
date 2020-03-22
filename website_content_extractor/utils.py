@@ -27,11 +27,13 @@ def get_url_images_from_html(url: Text) -> Union[List[Text], None]:
         url_images = []
         for img_tag in soup.find_all('img'):
             url_photo = img_tag['src']
-            p = urlparse(url_photo)
-            if not p.hostname:
-                url_photo = parsed_uri.hostname + url_photo
-            if not p.scheme:
-                url_photo = parsed_uri.scheme + ':' + url_photo if url_photo.startswith('//') else parsed_uri.scheme + '://' + url_photo
+            parsed_url = urlparse(url_photo)
+            if not parsed_url.hostname:
+                hostname = parsed_uri.hostname
+                url_photo = hostname + url_photo if hostname.endswith('/') else hostname + '/' + url_photo
+            if not parsed_url.scheme:
+                scheme = parsed_uri.scheme
+                url_photo = scheme + ':' + url_photo if url_photo.startswith('//') else scheme + '://' + url_photo
             if validate_url(url_photo):
                 url_images.append(url_photo)
         return url_images
