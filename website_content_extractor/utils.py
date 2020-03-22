@@ -13,7 +13,7 @@ from requests.exceptions import MissingSchema, ConnectionError, HTTPError, Inval
 logger = logging.getLogger(__name__)
 
 
-def get_url_photos_from_html(url: Text) -> Union[List[Text], None]:
+def get_url_images_from_html(url: Text) -> Union[List[Text], None]:
     """
     Function gets url and returns a list of urls with all images from url input
     :param url:
@@ -24,7 +24,7 @@ def get_url_photos_from_html(url: Text) -> Union[List[Text], None]:
     if r:
         parsed_uri = urlparse(url)
         soup = bs.BeautifulSoup(r.text, features='html.parser')
-        url_photos = []
+        url_images = []
         for img_tag in soup.find_all('img'):
             url_photo = img_tag['src']
             p = urlparse(url_photo)
@@ -33,8 +33,8 @@ def get_url_photos_from_html(url: Text) -> Union[List[Text], None]:
             if not p.scheme:
                 url_photo = parsed_uri.scheme + ':' + url_photo if url_photo.startswith('//') else parsed_uri.scheme + '://' + url_photo
             if validate_url(url_photo):
-                url_photos.append(url_photo)
-        return url_photos
+                url_images.append(url_photo)
+        return url_images
 
 
 def get_text_from_html(url: Text) -> Union[List[Text], None]:
