@@ -6,9 +6,9 @@ from django.views import View
 from rest_framework import generics
 from rest_framework import filters
 from website_content_extractor.forms import QueueTaskForm
-from website_content_extractor.models import QueueTask
+from website_content_extractor.models import QueueTask, WebsiteText
 from website_content_extractor.pagination import ResultSetPagination
-from website_content_extractor.serializers import QueueTaskSerializer
+from website_content_extractor.serializers import QueueTaskSerializer, WebsiteTextSerializer
 
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -49,5 +49,15 @@ class QueueTaskList(generics.ListCreateAPIView):
     filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
     filterset_fields = ('state', 'get_text', 'get_image')
     search_fields = ['url']
+    ordering_fields = ['id', 'created_at', 'updated_at']
+    ordering = ['created_at']
+
+
+class WebsiteTextList(generics.ListAPIView):
+    queryset = WebsiteText.objects.all()
+    serializer_class = WebsiteTextSerializer
+    pagination_class = ResultSetPagination
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['text']
     ordering_fields = ['id', 'created_at', 'updated_at']
     ordering = ['created_at']
