@@ -3,9 +3,15 @@ import logging
 from django.db import DatabaseError, transaction
 from django.shortcuts import render
 from django.views import View
-
+from rest_framework import generics
+from rest_framework import filters
 from website_content_extractor.forms import QueueTaskForm
 from website_content_extractor.models import QueueTask
+from website_content_extractor.pagination import ResultSetPagination
+from website_content_extractor.serializers import QueueTaskSerializer
+
+from django_filters.rest_framework import DjangoFilterBackend
+
 
 logger = logging.getLogger(__name__)
 
@@ -34,3 +40,14 @@ class QueueTaskView(View):
             else:
                 return render(request, 'queue_task_form.html', {'form': form, 'status': 'warning'})
         return render(request, 'queue_task_form.html', {'form': form})
+
+
+class QueueTaskList(generics.ListCreateAPIView):
+    queryset = QueueTask.objects.all()
+    serializer_class = QueueTaskSerializer
+    pagination_class = ResultSetPagination
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
+    filterset_fields = ('state', 'get_text', 'get_image')
+    search_fields = ['url']
+    ordering_fields = ['id', 'created_at', 'updated_at']
+    ordering = ['created_at']

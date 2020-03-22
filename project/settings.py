@@ -39,8 +39,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # local apps
+    # own apps
     'website_content_extractor',
+    # external apps
+    'rest_framework',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -134,7 +137,6 @@ if DEBUG:
         LOGGING['loggers'][logger]['handlers'] = ['console']
 
 
-
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
@@ -183,3 +185,8 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_LOCK_ID = 'website_extracting'
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',)
+}

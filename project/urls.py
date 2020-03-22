@@ -16,9 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from website_content_extractor.views import QueueTaskView
+from website_content_extractor.views import QueueTaskView, QueueTaskList
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', QueueTaskView.as_view(), name='home')
+    path('', QueueTaskView.as_view(), name='home'),
+    path('api/tasks/', QueueTaskList.as_view(), name='api-home'),
 ]
