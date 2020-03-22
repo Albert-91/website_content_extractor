@@ -6,9 +6,9 @@ from django.views import View
 from rest_framework import generics
 from rest_framework import filters
 from website_content_extractor.forms import QueueTaskForm
-from website_content_extractor.models import QueueTask, WebsiteText
+from website_content_extractor.models import QueueTask, WebsiteText, WebsiteImage
 from website_content_extractor.pagination import ResultSetPagination
-from website_content_extractor.serializers import QueueTaskSerializer, WebsiteTextSerializer
+from website_content_extractor.serializers import QueueTaskSerializer, WebsiteTextSerializer, WebsiteImageSerializer
 
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -53,6 +53,11 @@ class QueueTaskList(generics.ListCreateAPIView):
     ordering = ['created_at']
 
 
+class QueueTaskDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = QueueTask.objects.all()
+    serializer_class = QueueTaskSerializer
+
+
 class WebsiteTextList(generics.ListAPIView):
     queryset = WebsiteText.objects.all()
     serializer_class = WebsiteTextSerializer
@@ -61,3 +66,23 @@ class WebsiteTextList(generics.ListAPIView):
     search_fields = ['text']
     ordering_fields = ['id', 'created_at', 'updated_at']
     ordering = ['created_at']
+
+
+class WebsiteTextDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = WebsiteText.objects.all()
+    serializer_class = WebsiteTextSerializer
+
+
+class WebsiteImageList(generics.ListAPIView):
+    queryset = WebsiteImage.objects.all()
+    serializer_class = WebsiteImageSerializer
+    pagination_class = ResultSetPagination
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['image_url']
+    ordering_fields = ['id', 'created_at', 'updated_at']
+    ordering = ['created_at']
+
+
+class WebsiteImageDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = WebsiteImage.objects.all()
+    serializer_class = WebsiteImageSerializer

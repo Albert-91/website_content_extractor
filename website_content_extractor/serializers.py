@@ -12,9 +12,11 @@ class WebsiteTextSerializer(serializers.ModelSerializer):
 
 
 class WebsiteImageSerializer(serializers.ModelSerializer):
+    task_url = serializers.CharField(source='task.url', read_only=True)
+
     class Meta:
         model = WebsiteImage
-        fields = serializers.ALL_FIELDS
+        fields = ['id', 'created_at', 'updated_at', 'image', 'image_url', 'task', 'task_url']
 
 
 class QueueTaskSerializer(serializers.ModelSerializer):
