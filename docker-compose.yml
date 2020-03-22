@@ -25,6 +25,7 @@ services:
     ports:
       - 8000:8000
     volumes:
+      - ./media:/app/media
       - ./project:/app/project
       - ./website_content_extractor:/app/website_content_extractor
 
@@ -74,4 +75,5 @@ services:
       - .env
     volumes:
       - ./project:/app/project
+      - ./media:/app/media
       - ./website_content_extractor:/app/website_content_extractor
