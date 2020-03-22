@@ -37,11 +37,21 @@ class QueueTask(Timestamps, models.Model):
 
 
 class WebsiteImage(Timestamps, models.Model):
-    image = models.ImageField(verbose_name=_("image"), upload_to='media/', null=True)
+    image = models.ImageField(verbose_name=_("image"), upload_to='images/', null=True)
     image_url = models.URLField(verbose_name=_("image url"), blank=True, max_length=1000)
     task = models.ForeignKey(to=QueueTask, on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = "website image"
+        verbose_name = _("website image")
+        verbose_name_plural = _("website images")
 
 
 class WebsiteText(Timestamps, models.Model):
     text = JSONField(verbose_name=_("texts"), default=list, blank=True, null=False)
     task = models.ForeignKey(to=QueueTask, on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = "website text"
+        verbose_name = _("website text")
+        verbose_name_plural = _("website texts")
