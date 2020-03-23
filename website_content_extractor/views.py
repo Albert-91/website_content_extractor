@@ -1,17 +1,19 @@
 import logging
+from wsgiref.util import FileWrapper
 
 from django.db import DatabaseError, transaction
+from django.http import HttpResponse
 from django.shortcuts import render
 from django.views import View
-from rest_framework import generics
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
+from rest_framework import generics
+from rest_framework.views import APIView
+
 from website_content_extractor.forms import QueueTaskForm
 from website_content_extractor.models import QueueTask, WebsiteText, WebsiteImage
 from website_content_extractor.pagination import ResultSetPagination
 from website_content_extractor.serializers import QueueTaskSerializer, WebsiteTextSerializer, WebsiteImageSerializer
-
-from django_filters.rest_framework import DjangoFilterBackend
-
 
 logger = logging.getLogger(__name__)
 
@@ -86,3 +88,14 @@ class WebsiteImageList(generics.ListAPIView):
 class WebsiteImageDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = WebsiteImage.objects.all()
     serializer_class = WebsiteImageSerializer
+
+
+class ImageDownloadView(APIView):
+
+    def get(self, request, name, format=None):
+        name = "images/" + name
+        img = WebsiteImage.objects.get(image=name)
+        document = open(img.image.path, 'rb')
+        response = HttpResponse(FileWrapper(document), content_type='application/msword')
+        response['Content-Disposition'] = 'attachment; filename="%s"' % name
+        return response

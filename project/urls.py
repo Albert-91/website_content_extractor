@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path
 
 from website_content_extractor.views import QueueTaskView, QueueTaskList, WebsiteTextList, WebsiteImageList, \
-    QueueTaskDetail, WebsiteTextDetail, WebsiteImageDetail
+    QueueTaskDetail, WebsiteTextDetail, WebsiteImageDetail, ImageDownloadView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -28,4 +28,5 @@ urlpatterns = [
     path('api/texts/<pk>', WebsiteTextDetail.as_view(), name='api-text'),
     path('api/images/', WebsiteImageList.as_view(), name='api-images'),
     path('api/images/<pk>', WebsiteImageDetail.as_view(), name='api-image'),
+    path('media/images/<name>', ImageDownloadView.as_view(), name='api-image-download'),
 ]
