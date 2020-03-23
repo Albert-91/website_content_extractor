@@ -4,7 +4,7 @@ Repository contains Django application with microservice getting URL from user w
 images or both and saves it to database. Next periodically celery worker extracts given URL for those parameters and 
 saves it in database. All tasks, saved images and saved texts are visible in REST API.
 
-### Procedures
+### Procedures to run application
 
 Firstly copy file with environ variables `.env_template` with new name `.env`. You can do it by command:
 ```bash
@@ -33,9 +33,9 @@ list, because this type of structure should be more helpful for ML developers th
 
 #### Comment from author
 Co poszło ok:
-  1. Ponieważ Postgres bardzo długo się uruchamia, już po wystartowaniu kontenera, po raz pierwszy zaczął mi nie 
+  1. Ponieważ Postgres bardzo długo się uruchamia nawet po wystartowaniu kontenera, po raz pierwszy zaczął mi nie 
   wystarczać 'dockerowy' atrybut usługi `depends_on`, przez co zacząłem szukać metody opóźnienia startu pozostałych usług. 
-  W ten sposób znalazłem skrypt na w dokumentacji dockera `wait_for_it.sh`. Prosty kawałek kodu, a z pewnością nie raz 
+  W ten sposób znalazłem skrypt w dokumentacji dockera `wait_for_it.sh`. Prosty kawałek kodu, a z pewnością nie raz 
   z niego w przyszłości skorzystam. 
 
 Co poszło nie tak:
