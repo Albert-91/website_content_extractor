@@ -20,8 +20,9 @@ class QueueTask(Timestamps, models.Model):
         def value_name_pairs(cls) -> List:
             return list(map(lambda state: (state.value, state.name), cls))
 
+    regex = '(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})'
     url = models.URLField(_("URL"), blank=False, max_length=1000, null=False, validators=[RegexValidator(
-        regex='(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})',
+        regex=regex,
         message='Invalid URL'
     )])
     get_text = models.BooleanField(verbose_name=_("get texts"), default=True)

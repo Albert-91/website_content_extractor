@@ -1,5 +1,8 @@
+import re
+
 from django.test import TestCase
 
+from website_content_extractor.models import QueueTask
 from website_content_extractor.utils import get_url_images_from_html, get_text_from_html, validate_url
 
 
@@ -58,3 +61,57 @@ class GetTextFromHtml(TestCase):
     def test__text_extractor__should__return__not_empty_list(self):
         len_of_list = len(get_text_from_html('http://www.google.pl'))
         self.assertGreater(len_of_list, 0)
+
+
+class TestQueueTaskModel(TestCase):
+
+    def test__url_field_regex__should__return__true(self):
+        pattern = QueueTask.regex
+        test_urls = [
+            'www.google.pl',
+            'www.google.com',
+            'www.google.com/abc',
+            'www.google.com/abc.html',
+            'www.google.com/abc#def',
+            'www.google.com@aaa/abc#def',
+            'www.google.com/abc/111#def',
+            'http://www.google.pl',
+            'http://www.google.com',
+            'http://dev.google.com',
+            'http://google.com',
+            'http://www.google.com/abc',
+            'http://www.google.com/abc.html',
+            'http://www.google.com/abc#def',
+            'http://www.google.com@aaa/abc#def',
+            'http://www.google.com/abc/111#def',
+            'https://www.google.pl',
+            'https://www.google.com',
+            'https://dev.google.com',
+            'https://google.com',
+            'https://www.google.com/abc',
+            'https://www.google.com/abc.html',
+            'https://www.google.com/abc#def',
+            'https://www.google.com@aaa/abc#def',
+            'https://www.google.com/abc/111#def',
+        ]
+        for url in test_urls:
+            result = re.match(pattern, url)
+            self.assertTrue(result)
+
+    def test__url_field_regex__should__return__false(self):
+        pattern = QueueTask.regex
+        test_urls = [
+            'http//www.google.pl',
+            'http:/www.google.pl',
+            'sftp://www.google.com',
+            'ftp://www.google.com',
+            'http:/www.google.paaaal',
+            'http:/www.google.pl/@#aa',
+            'http:/wwwgoogle.pl',
+            'http:/www.googlepl',
+            'google.pl',
+            'dev.google.com',
+        ]
+        for url in test_urls:
+            result = re.match(pattern, url)
+            self.assertFalse(result)
