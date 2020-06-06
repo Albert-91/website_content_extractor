@@ -23,3 +23,12 @@ class QueueTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = QueueTask
         fields = serializers.ALL_FIELDS
+
+    def create(self, validated_data):
+        validated_data['state'] = QueueTask.TaskState.PENDING.value
+        return QueueTask.objects.create(**validated_data)
+
+    def validate(self, data):
+        if not any([data['get_text'], data['get_image']]):
+            raise serializers.ValidationError("Both parameters get_text and get_image are set to false")
+        return data
