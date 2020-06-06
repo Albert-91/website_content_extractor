@@ -1,6 +1,6 @@
 import logging
 from typing import Text, List, Union
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlunparse
 
 import bs4 as bs
 import requests
@@ -22,18 +22,16 @@ def get_url_images_from_html(url: Text) -> Union[List[Text], None]:
 
     r = validate_url(url)
     if r:
-        parsed_uri = urlparse(url)
+        parsed_url = urlparse(url)
         soup = bs.BeautifulSoup(r.text, features='html.parser')
         url_images = []
         for img_tag in soup.find_all('img'):
-            url_photo = img_tag['src']
-            parsed_url = urlparse(url_photo)
-            if not parsed_url.hostname:
-                hostname = parsed_uri.hostname
-                url_photo = hostname + url_photo if hostname.endswith('/') else hostname + '/' + url_photo
-            if not parsed_url.scheme:
-                scheme = parsed_uri.scheme
-                url_photo = scheme + ':' + url_photo if url_photo.startswith('//') else scheme + '://' + url_photo
+            url_photo = img_tag.attrs.get('src') or img_tag.attrs.get('data-src')
+            if not url_photo:
+                continue
+            parsed_url_photo = urlparse(url_photo)
+            if not parsed_url_photo.scheme or not parsed_url_photo.netloc:
+                url_photo = urlunparse((parsed_url.scheme, parsed_url.netloc, parsed_url_photo.path, None, None, None))
             if validate_url(url_photo):
                 url_images.append(url_photo)
         return url_images
