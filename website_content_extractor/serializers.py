@@ -29,6 +29,6 @@ class QueueTaskSerializer(serializers.ModelSerializer):
         return QueueTask.objects.create(**validated_data)
 
     def validate(self, data):
-        if not any([data['get_text'], data['get_image']]):
+        if not any([data.get('get_text'), data.get('get_image')]):
             raise serializers.ValidationError("Both parameters get_text and get_image are set to false")
         return data
