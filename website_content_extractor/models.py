@@ -25,10 +25,10 @@ class QueueTask(Timestamps, models.Model):
         regex=regex,
         message='Invalid URL'
     )])
-    get_text = models.BooleanField(verbose_name=_("get texts"), default=True)
-    get_image = models.BooleanField(verbose_name=_("get images"), default=True)
+    get_text = models.BooleanField(verbose_name=_("get texts"), default=False, blank=True)
+    get_image = models.BooleanField(verbose_name=_("get images"), default=False, blank=True)
     state = models.CharField(
-        verbose_name=_("state"), choices=TaskState.value_name_pairs(), max_length=20, default=TaskState.PENDING.value,
+        verbose_name=_("state"), choices=TaskState.value_name_pairs(), max_length=20, default=TaskState.PENDING.value, blank=True
     )
 
     class Meta:
