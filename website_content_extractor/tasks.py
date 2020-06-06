@@ -26,7 +26,8 @@ def extract_website():
             return
 
         tasks = QueueTask.objects.filter(state=QueueTask.TaskState.PENDING.value).order_by('created_at')
-        save_website_content(tasks)
+        if tasks:
+            save_website_content(tasks)
 
 
 def save_website_content(tasks: List[QueueTask]):
