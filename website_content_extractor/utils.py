@@ -24,17 +24,17 @@ def get_url_images_from_html(url: Text) -> Union[List[Text], None]:
     if r:
         parsed_url = urlparse(url)
         soup = bs.BeautifulSoup(r.text, features='html.parser')
-        url_images = []
+        images_urls = []
         for img_tag in soup.find_all('img'):
-            url_photo = img_tag.attrs.get('src') or img_tag.attrs.get('data-src')
-            if not url_photo:
+            image_url = img_tag.attrs.get('src') or img_tag.attrs.get('data-src')
+            if not image_url:
                 continue
-            parsed_url_photo = urlparse(url_photo)
-            if not parsed_url_photo.scheme or not parsed_url_photo.netloc:
-                url_photo = urlunparse((parsed_url.scheme, parsed_url.netloc, parsed_url_photo.path, None, None, None))
-            if validate_url(url_photo):
-                url_images.append(url_photo)
-        return url_images
+            parsed_image_url = urlparse(image_url)
+            if not any([parsed_image_url.scheme, parsed_image_url.netloc]):
+                image_url = urlunparse((parsed_url.scheme, parsed_url.netloc, parsed_image_url.path, None, None, None))
+            if validate_url(image_url):
+                images_urls.append(image_url)
+        return images_urls
 
 
 def get_text_from_html(url: Text) -> Union[List[Text], None]:
