@@ -16,12 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from website_content_extractor.views import QueueTaskView, QueueTaskList, WebsiteTextList, WebsiteImageList, \
+from website_content_extractor.views import QueueTaskList, WebsiteTextList, WebsiteImageList, \
     QueueTaskDetail, WebsiteTextDetail, WebsiteImageDetail, ImageDownloadView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', QueueTaskView.as_view(), name='home'),
     path('api/tasks/', QueueTaskList.as_view(), name='api-tasks'),
     path('api/tasks/<pk>', QueueTaskDetail.as_view(), name='api-task'),
     path('api/texts/', WebsiteTextList.as_view(), name='api-texts'),
