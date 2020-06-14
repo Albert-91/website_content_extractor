@@ -1,5 +1,7 @@
 import json
 import logging
+from concurrent.futures import ThreadPoolExecutor
+from functools import partial
 from os.path import basename
 from typing import List, Text
 from urllib.parse import urlsplit
@@ -35,7 +37,7 @@ def save_website_content(tasks: List[QueueTask]):
         with transaction.atomic():
             for task in tasks:
                 if task.get_image:
-                    urls = get_url_images_from_html(task.url)
+                    urls = get_url_images_from_html(task.url) or []
                     save_images(urls, task)
                     logger.info("Saved all images from task id: %s" % task.pk)
                 if task.get_text:
@@ -50,14 +52,19 @@ def save_website_content(tasks: List[QueueTask]):
 
 def save_images(urls: List[Text], task: QueueTask):
     try:
-        for url in urls:
-            with NamedTemporaryFile() as tf:
-                r = requests.get(url, stream=True)
-                for chunk in r.iter_content(chunk_size=4096):
-                    tf.write(chunk)
-                tf.seek(0)
-                img = WebsiteImage(image_url=url, task=task)
-                img.image.save(basename(urlsplit(url).path), File(tf))
-                logger.info("Successfully saved image %s" % urlsplit(url).path)
+        get_image_task = partial(get_image, task=task)
+        with ThreadPoolExecutor() as executor:
+            executor.map(get_image_task, urls)
     except Exception as e:
         logger.error("Error during saving image: %s" % e)
+
+
+def get_image(url: Text, task: QueueTask):
+    with NamedTemporaryFile() as tf:
+        r = requests.get(url, stream=True)
+        for chunk in r.iter_content(chunk_size=4096):
+            tf.write(chunk)
+        tf.seek(0)
+        img = WebsiteImage(image_url=url, task=task)
+        img.image.save(basename(urlsplit(url).path), File(tf))
+        logger.info("Successfully saved image %s" % urlsplit(url).path)
