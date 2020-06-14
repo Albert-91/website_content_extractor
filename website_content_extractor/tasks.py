@@ -37,7 +37,7 @@ def save_website_content(tasks: List[QueueTask]):
         with transaction.atomic():
             for task in tasks:
                 if task.get_image:
-                    urls = get_url_images_from_html(task.url)
+                    urls = get_url_images_from_html(task.url) or []
                     save_images(urls, task)
                     logger.info("Saved all images from task id: %s" % task.pk)
                 if task.get_text:
