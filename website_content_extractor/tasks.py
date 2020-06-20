@@ -1,14 +1,11 @@
-import json
 import logging
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
-from os.path import basename
 from typing import List, Text
 from urllib.parse import urlsplit
 
 import requests
 from celery import shared_task
-from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
 from django.db import transaction, DatabaseError
 from django_pglocks import advisory_lock
@@ -27,7 +24,7 @@ def extract_website():
             logger.info("already running task: extract_website; exit")
             return
 
-        tasks = QueueTask.objects.filter(state=QueueTask.TaskState.PENDING.value).order_by('created_at')
+        tasks = QueueTask.get_tasks_to_run()
         if tasks:
             save_website_content(tasks)
 
@@ -42,10 +39,9 @@ def save_website_content(tasks: List[QueueTask]):
                     logger.info("Saved all images from task id: %s" % task.pk)
                 if task.get_text:
                     texts = get_text_from_html(task.url) or []
-                    WebsiteText.objects.create(text=json.dumps(texts), task=task)
+                    WebsiteText.save_texts(texts, task)
                     logger.info("Saved all texts from task id: %s" % task.pk)
-                task.state = QueueTask.TaskState.SUCCESS.value
-                task.save()
+                task.set_success_state()
     except DatabaseError as e:
         logger.error("Database error: %s" % e)
 
@@ -66,5 +62,5 @@ def get_image(url: Text, task: QueueTask):
             tf.write(chunk)
         tf.seek(0)
         img = WebsiteImage(image_url=url, task=task)
-        img.image.save(basename(urlsplit(url).path), File(tf))
+        img.save_image(tf)
         logger.info("Successfully saved image %s" % urlsplit(url).path)
