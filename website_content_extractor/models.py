@@ -1,9 +1,14 @@
+import json
 from enum import Enum
+from os.path import basename
 from typing import List
+from urllib.parse import urlsplit
 
 from django.contrib.postgres.fields import JSONField
+from django.core.files import File
 from django.core.validators import RegexValidator
 from django.db import models
+from django.db.models import QuerySet
 from django.utils.translation import ugettext_lazy as _
 
 from website_content_extractor.mixins import Timestamps
@@ -36,6 +41,14 @@ class QueueTask(Timestamps, models.Model):
         verbose_name = _("queue task")
         verbose_name_plural = _("queue tasks")
 
+    @classmethod
+    def get_tasks_to_run(cls) -> List[QuerySet]:
+        return cls.objects.filter(state=cls.TaskState.PENDING.value).order_by('created_at')
+
+    def set_success_state(self):
+        self.state = QueueTask.TaskState.SUCCESS.value
+        self.save()
+
 
 class WebsiteImage(Timestamps, models.Model):
     image = models.ImageField(verbose_name=_("image"), upload_to='images/', null=True)
@@ -47,6 +60,10 @@ class WebsiteImage(Timestamps, models.Model):
         verbose_name = _("website image")
         verbose_name_plural = _("website images")
 
+    def save_image(self, temp_file):
+        img = WebsiteImage(image_url=self.image_url, task=self.task)
+        img.image.save(basename(urlsplit(self.image_url).path), File(temp_file))
+
 
 class WebsiteText(Timestamps, models.Model):
     text = JSONField(verbose_name=_("texts"), default=list, blank=True, null=False)
@@ -56,3 +73,7 @@ class WebsiteText(Timestamps, models.Model):
         db_table = "website text"
         verbose_name = _("website text")
         verbose_name_plural = _("website texts")
+
+    @classmethod
+    def save_texts(cls, texts, task):
+        return cls.objects.create(text=json.dumps(texts), task=task)
